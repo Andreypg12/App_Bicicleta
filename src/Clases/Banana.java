@@ -3,7 +3,7 @@ package Clases;
 public class Banana extends Bicicleta{
     
     public Banana() {
-        
+        super.setNombre("Banana");
     }
     
     @Override
@@ -17,4 +17,5 @@ public class Banana extends Bicicleta{
         }
         return 0;
     }
+    
 }

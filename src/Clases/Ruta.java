@@ -3,7 +3,7 @@ package Clases;
 public class Ruta extends Bicicleta{
     
     public Ruta() {
-        
+        super.setNombre("Ruta");
     }
     
     @Override

@@ -8,7 +8,6 @@ public abstract class Bicicleta {
     }
     
     public abstract double calcularCostos(int horas);
-    
 
     public String getNombre() {
         return nombre;

@@ -1,20 +1,34 @@
-package Clases;
+package Ventanas;
 
+import Clases.Alquiler;
+import Clases.Banana;
+import Clases.Bicicleta;
+import Clases.Caramañola;
+import Clases.Casco;
+import Clases.Cliente;
+import Clases.ESeguro;
+import Clases.GPS;
+import Clases.Montaña;
+import Clases.Ruta;
+import Persistencia.PersistenciaAlquiler;
 import java.text.ParseException;
 import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 import javax.swing.text.MaskFormatter;
 
-public class PrincipalFrame extends javax.swing.JFrame {
+public class JFrameAlquiler extends javax.swing.JFrame {
+    
+    private Alquiler alquiler;
 
-    public PrincipalFrame() {
+    public JFrameAlquiler() {
         initComponents();
         llenarComboBox();
-        
+        jTxtForIdentificacion.requestFocus();
     }
     
     
@@ -35,15 +49,15 @@ public class PrincipalFrame extends javax.swing.JFrame {
         jLblBanana = new javax.swing.JLabel();
         jLblMontana = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        jTxtIdentificacion1 = new javax.swing.JTextField();
+        jTxtNombre = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         jPanelServicios = new javax.swing.JPanel();
         jChBoxCasco = new javax.swing.JCheckBox();
         jChBoxGPS = new javax.swing.JCheckBox();
         jChBoxCaramanola = new javax.swing.JCheckBox();
         jTxtForIdentificacion = new javax.swing.JFormattedTextField();
-        jSpinner1 = new javax.swing.JSpinner();
-        jSpinner2 = new javax.swing.JSpinner();
+        jSpinnerHoras = new javax.swing.JSpinner();
+        jSpinnerFecha = new javax.swing.JSpinner();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -53,7 +67,7 @@ public class PrincipalFrame extends javax.swing.JFrame {
         jBtnCalcular = new javax.swing.JButton();
         jBtnGuardar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Alquiler de bicicletas");
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Seleccione el tipo de bicicleta"));
@@ -161,10 +175,10 @@ public class PrincipalFrame extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(1, 1, 12, 1));
+        jSpinnerHoras.setModel(new javax.swing.SpinnerNumberModel(1, 1, 12, 1));
 
-        jSpinner2.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(1728448373142L), null, null, java.util.Calendar.DAY_OF_MONTH));
-        jSpinner2.setEditor(new javax.swing.JSpinner.DateEditor(jSpinner2, "dd/MM/YYYY"));
+        jSpinnerFecha.setModel(new javax.swing.SpinnerDateModel(new java.util.Date(), null, null, java.util.Calendar.DAY_OF_WEEK_IN_MONTH));
+        jSpinnerFecha.setEditor(new javax.swing.JSpinner.DateEditor(jSpinnerFecha, "dd/MM/YYYY"));
 
         jLabel3.setText("Fecha");
 
@@ -177,8 +191,19 @@ public class PrincipalFrame extends javax.swing.JFrame {
         jTxtTotalPagar.setEditable(false);
 
         jBtnCalcular.setText("Calcular");
+        jBtnCalcular.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnCalcularActionPerformed(evt);
+            }
+        });
 
         jBtnGuardar.setText("Guardar");
+        jBtnGuardar.setEnabled(false);
+        jBtnGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnGuardarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -204,12 +229,12 @@ public class PrincipalFrame extends javax.swing.JFrame {
                                             .addComponent(jLabel5))
                                         .addGap(37, 37, 37)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jTxtIdentificacion1)
+                                            .addComponent(jTxtNombre)
                                             .addGroup(layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                    .addComponent(jSpinner1)
+                                                    .addComponent(jSpinnerHoras)
                                                     .addComponent(jCBSeguro, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                    .addComponent(jSpinnerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(0, 0, Short.MAX_VALUE)))))
                                 .addGap(35, 35, 35)
                                 .addComponent(jPanelServicios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -243,15 +268,16 @@ public class PrincipalFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTxtIdentificacion1))
+                            .addComponent(jTxtNombre))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jSpinnerFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSpinnerHoras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanelServicios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -272,38 +298,66 @@ public class PrincipalFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(PrincipalFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(PrincipalFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(PrincipalFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(PrincipalFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    private void jBtnCalcularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnCalcularActionPerformed
+        // TODO add your handling code here:
+        if(revisarEspacios()){
+            Cliente cliente = new Cliente(jTxtForIdentificacion.getText(), jTxtNombre.getText());
+            Bicicleta bicicleta = verificarVicicleta();
+            ESeguro seguro = (ESeguro)jCBSeguro.getSelectedItem();
+            Date fecha = (Date)jSpinnerFecha.getValue();
+            int horas = (int)jSpinnerHoras.getValue();
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                PrincipalFrame ventana = new PrincipalFrame();
-                ventana.setVisible(true);
-                ventana.setLocationRelativeTo(null);
-            }
-        });
+            alquiler = new Alquiler(cliente, bicicleta, seguro, fecha, horas);
+            agregarServicios();
+            jTxtTotalPagar.setText(String.format("%.2f", alquiler.calcularTotal()));
+            JOptionPane.showMessageDialog(null, alquiler.toString());
+            jBtnGuardar.setEnabled(true);
+        }
+    }//GEN-LAST:event_jBtnCalcularActionPerformed
+
+    private void jBtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnGuardarActionPerformed
+        // TODO add your handling code here:
+        PersistenciaAlquiler.agregarAlquiler(alquiler);
+        jBtnGuardar.setEnabled(false);
+    }//GEN-LAST:event_jBtnGuardarActionPerformed
+
+    private boolean revisarEspacios(){
+        if (jTxtNombre.getText().isBlank()) {
+            JOptionPane.showMessageDialog(null, "El espacio del nombre esta vacío", "Espacio incorrecto", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        else if (!jRbMontana.isSelected() & !jRbRuta.isSelected() & !jRbBanana.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Debes escoger un tipo de bicicleta", "Espacio incorrecto", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        else if (!jRbMontana.isSelected() & !jRbRuta.isSelected() & !jRbBanana.isSelected()) {
+            JOptionPane.showMessageDialog(null, "Debes escoger un tipo de bicicleta", "Espacio incorrecto", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        
+        return true;
+    }
+    private void agregarServicios(){
+        if(jChBoxCaramanola.isSelected()){
+            alquiler.agregarServicio(new Caramañola());
+        }
+        if (jChBoxCasco.isSelected()) {
+            alquiler.agregarServicio(new Casco());
+        }
+        if (jChBoxGPS.isSelected()) {
+            alquiler.agregarServicio(new GPS());
+        }
+    }
+    private Bicicleta verificarVicicleta(){
+        if (jRbMontana.isSelected()) {
+            return new Montaña();
+        }
+        else if(jRbBanana.isSelected()){
+            return new Banana();
+        }
+        else{
+            return new Ruta();
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -328,10 +382,10 @@ public class PrincipalFrame extends javax.swing.JFrame {
     private javax.swing.JRadioButton jRbBanana;
     private javax.swing.JRadioButton jRbMontana;
     private javax.swing.JRadioButton jRbRuta;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
+    private javax.swing.JSpinner jSpinnerFecha;
+    private javax.swing.JSpinner jSpinnerHoras;
     private javax.swing.JFormattedTextField jTxtForIdentificacion;
-    private javax.swing.JTextField jTxtIdentificacion1;
+    private javax.swing.JTextField jTxtNombre;
     private javax.swing.JTextField jTxtTotalPagar;
     // End of variables declaration//GEN-END:variables
 }
